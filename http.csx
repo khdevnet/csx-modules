@@ -74,6 +74,11 @@ public class RequestSender
 
         return Response;
     }
+
+    public HttpResponseMessage Send()
+    {
+        return SendAsync().GetAwaiter().GetResult();
+    }
 }
 
 public class HttpResponse
@@ -87,6 +92,11 @@ public class HttpResponse<TData> : HttpResponse
 }
 
 #region extenisons
+
+public static TData ToData<TData>(this HttpResponseMessage message)
+{
+    return message.ToDataAsync<TData>().GetAwaiter().GetResult();
+}
 
 public static Task<TData> ToDataAsync<TData>(this HttpResponseMessage message)
 {
@@ -129,7 +139,7 @@ public static string ToJsonPrettify(this HttpResponseMessage resp)
     if (data != null)
     {
 
-        return (data.StartsWith("{") ? data : $"{{\"content\":\"{data}\"}}").ToJsonPrettify();
+        return ((data.StartsWith("{") || data.StartsWith("[")) ? data : $"{{\"content\":\"{data}\"}}").ToJsonPrettify();
     }
     else
     {
